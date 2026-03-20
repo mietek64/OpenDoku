@@ -50,7 +50,7 @@ def get_app_data_dir() -> pathlib.Path:
         xdg = os.environ.get("XDG_CONFIG_HOME", "")
         base = pathlib.Path(xdg).expanduser() if xdg else pathlib.Path("~/.config").expanduser()
 
-    app_dir = base / "Sudoku"
+    app_dir = base / "OpenDoku"
     app_dir.mkdir(parents=True, exist_ok=True)
     return app_dir
 
