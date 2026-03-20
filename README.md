@@ -9,7 +9,7 @@ Frameless window, three themes, mistake limits, auto-save — no ads, no account
  
 ## Preview
  
-![OpenDoku preview](preview.png)
+![OpenDoku preview](Preview.png)
  
 Four difficulties, dark/light/auto theme, mistake pips, pencil marks, 3 hints per puzzle.
  
