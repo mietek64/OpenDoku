@@ -19,7 +19,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) · versi
 - Wrong cells must be erased before re-entry — prevents cycling exploit
 - Maximum 3 hints per puzzle
 - Notes (pencil marks) mode
-- Unlimited undo — mistakes not refunded on undo
 - Dark, Light, and Auto (system) themes with live OS detection
 - Full keyboard navigation: arrows, 1–9, Backspace, Ctrl+Z, N
 - Auto-save to platform app data directory on every move
