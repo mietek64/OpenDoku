@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-theme-mode="auto">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenDoku</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- CUSTOM TITLE BAR -->
+  <header class="titlebar" id="titlebar">
+
+    <!-- Left: theme cycler -->
+    <div class="titlebar-left">
+      <button class="wbtn wbtn-theme" id="btn-theme">
+        <svg class="icon-theme icon-sun" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="10" cy="10" r="4"/>
+          <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42"/>
+        </svg>
+        <svg class="icon-theme icon-moon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M17 11.5A7 7 0 1 1 8.5 3a5.5 5.5 0 0 0 8.5 8.5z"/>
+        </svg>
+        <svg class="icon-theme icon-auto" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+          <rect x="2" y="3" width="16" height="11" rx="2"/>
+          <path d="M7 17h6M10 14v3"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Centre: wordmark -->
+    <span class="titlebar-wordmark">OPENDOKU</span>
+
+    <!-- Right: window controls -->
+    <div class="titlebar-right">
+      <button class="wbtn wbtn-minimize" id="btn-minimize" onclick="wMinimize()">_</button>
+      <button class="wbtn wbtn-close"    id="btn-close"    onclick="wClose()">✕</button>
+    </div>
+
+  </header>
+
+  <!-- MAIN GAME AREA -->
+  <main class="app">
+
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1 class="app-title">OpenDoku</h1>
+        <div class="game-meta">
+          <time class="timer" id="timer">00:00</time>
+          <div class="lives" id="lives" aria-label="Mistakes used"></div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="select-wrap">
+          <select id="sel-difficulty" class="select">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+            <option value="expert">Expert</option>
+          </select>
+          <svg class="select-arrow" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M1 1l4 4 4-4"/>
+          </svg>
+        </div>
+        <button class="btn-primary" id="btn-new">New Game</button>
+      </div>
+    </div>
+
+    <div class="board-wrap">
+      <div class="board" id="board"></div>
+    </div>
+
+    <div class="numpad" id="numpad">
+      <button class="num" data-n="1">1</button>
+      <button class="num" data-n="2">2</button>
+      <button class="num" data-n="3">3</button>
+      <button class="num" data-n="4">4</button>
+      <button class="num" data-n="5">5</button>
+      <button class="num" data-n="6">6</button>
+      <button class="num" data-n="7">7</button>
+      <button class="num" data-n="8">8</button>
+      <button class="num" data-n="9">9</button>
+    </div>
+
+    <div class="toolbar">
+      <button class="tool" id="btn-undo">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7">
+          <path d="M3 7v5h5"/><path d="M3 12a7 7 0 1 0 2-5"/>
+        </svg>
+        <span>Undo</span>
+      </button>
+      <button class="tool" id="btn-erase">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7">
+          <path d="M15 4L5 14M3 17h14"/><path d="M8.5 6.5L13 11"/>
+        </svg>
+        <span>Erase</span>
+      </button>
+      <button class="tool" id="btn-notes">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7">
+          <path d="M14 2l4 4-9 9H5v-4l9-9z"/><path d="M17 17H3"/>
+        </svg>
+        <span>Notes</span>
+      </button>
+      <button class="tool" id="btn-hint">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7">
+          <circle cx="10" cy="10" r="8"/>
+          <path d="M10 6v5M10 14h.01"/>
+        </svg>
+        <!-- label + remaining count rendered by JS -->
+        <span id="hint-label">Hint · 3</span>
+      </button>
+    </div>
+
+  </main>
+
+  <!-- RESULT OVERLAY — data-result="win" | "lose" -->
+  <div class="overlay" id="overlay" data-result="win">
+    <div class="overlay-card">
+      <div class="overlay-icon" id="overlay-icon">✦</div>
+      <h2 class="overlay-title" id="overlay-title">Puzzle Complete</h2>
+      <p  class="overlay-sub"   id="overlay-sub"></p>
+      <button class="btn-primary overlay-cta" id="btn-overlay-new">Play Again</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

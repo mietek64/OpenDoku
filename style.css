@@ -1,0 +1,706 @@
+/* ============================================================
+   SUDOKU — style.css
+   Themes: dark (default) | light | auto (system)
+   Fonts : Outfit (UI) · JetBrains Mono (board)
+   ============================================================ */
+
+
+/* ── 1. Design Tokens ─────────────────────────────────────── */
+
+:root {
+  --font-ui   : 'Outfit', 'Segoe UI', system-ui, sans-serif;
+  --font-board: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  --radius : 10px;
+  --radius-s:  6px;
+  --radius-xs: 4px;
+
+  --ease   : cubic-bezier(0.16, 1, 0.3, 1);
+  --dur    : 160ms;
+  --dur-lg : 320ms;
+
+  /* shared accent — overridden per theme if needed */
+  --accent      : #5B5FFF;
+  --accent-dim  : rgba(91, 95, 255, 0.18);
+  --accent-glow : rgba(91, 95, 255, 0.30);
+  --err         : #FF4B6E;
+  --err-dim     : rgba(255, 75, 110, 0.14);
+  --ok          : #40D9A4;
+}
+
+/* ── Dark theme (HTML default) ──────────────────────────────── */
+
+[data-theme="dark"] {
+  --bg          : #0C0C14;
+  --bg-surface  : #13131E;
+  --bg-raised   : #1C1C2C;
+  --bg-hover    : #22223A;
+
+  --cell-sel    : rgba(91,  95, 255, 0.22);
+  --cell-rel    : rgba(255, 255, 255, 0.04);
+  --cell-same   : rgba(91,  95, 255, 0.10);
+  --cell-err    : rgba(255,  75, 110, 0.13);
+
+  --txt         : #E4E4F0;
+  --txt-dim     : #5A5A7A;
+  --txt-given   : #E4E4F0;
+  --txt-user    : #7E80FF;
+  --txt-err     : #FF4B6E;
+  --txt-note    : #4E4E78;
+
+  --border-thin : rgba(255,255,255,0.07);
+  --border-box  : rgba(255,255,255,0.22);
+  --border-outer: rgba(255,255,255,0.30);
+  --border-ui   : rgba(255,255,255,0.09);
+
+  --tb-bg       : #0C0C14;
+  --btn-bg      : #1C1C2C;
+  --btn-hover   : #26263E;
+  --btn-txt     : #9898C0;
+  --sel-bg      : #1C1C2C;
+}
+
+/* ── Light theme ──────────────────────────────────────────── */
+
+[data-theme="light"] {
+  --accent      : #3D3DCC;
+  --accent-dim  : rgba(61,  61, 204, 0.12);
+  --accent-glow : rgba(61,  61, 204, 0.25);
+  --err         : #D92B50;
+  --err-dim     : rgba(217,  43,  80, 0.11);
+
+  --bg          : #F3F3FA;
+  --bg-surface  : #FFFFFF;
+  --bg-raised   : #EAEAF4;
+  --bg-hover    : #E4E4F0;
+
+  --cell-sel    : rgba(61,  61, 204, 0.14);
+  --cell-rel    : rgba(0,   0,   0,  0.03);
+  --cell-same   : rgba(61,  61, 204, 0.08);
+  --cell-err    : rgba(217,  43,  80, 0.10);
+
+  --txt         : #18182C;
+  --txt-dim     : #9090B0;
+  --txt-given   : #18182C;
+  --txt-user    : #3D3DCC;
+  --txt-err     : #D92B50;
+  --txt-note    : #A0A0C8;
+
+  --border-thin : rgba(0,0,0,0.09);
+  --border-box  : rgba(0,0,0,0.28);
+  --border-outer: rgba(0,0,0,0.38);
+  --border-ui   : rgba(0,0,0,0.10);
+
+  --tb-bg       : #F3F3FA;
+  --btn-bg      : #EAEAF4;
+  --btn-hover   : #DDDDF0;
+  --btn-txt     : #6060A0;
+  --sel-bg      : #FFFFFF;
+}
+
+
+/* ── 2. Reset & Base ──────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0; padding: 0;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body {
+  background : var(--bg);
+  color      : var(--txt);
+  font-family: var(--font-ui);
+  display    : flex;
+  flex-direction: column;
+  transition : background var(--dur-lg) var(--ease),
+               color      var(--dur-lg) var(--ease);
+}
+
+button { cursor: pointer; font-family: inherit; }
+svg    { display: block; flex-shrink: 0; }
+
+
+/* ── 3. Title Bar ─────────────────────────────────────────── */
+
+.titlebar {
+  position: relative;
+  height  : 38px;
+  display : flex;
+  align-items: center;
+  justify-content: space-between;
+  padding : 0 12px;
+  flex-shrink: 0;
+  background : var(--tb-bg);
+  border-bottom: 1px solid var(--border-thin);
+
+  /* Native drag region (Chromium / EdgeWebView2 / WKWebView) */
+  -webkit-app-region: drag;
+  app-region: drag;
+
+  transition: background var(--dur-lg) var(--ease);
+}
+
+.titlebar-left,
+.titlebar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  /* buttons must not be part of the drag region */
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+.titlebar-wordmark {
+  position : absolute;
+  left: 50%; transform: translateX(-50%);
+  font-family  : var(--font-board);
+  font-size    : 9px;
+  font-weight  : 600;
+  letter-spacing: 0.22em;
+  color        : var(--txt-dim);
+  pointer-events: none;
+}
+
+/* Base window button — shared reset */
+.wbtn {
+  background : transparent;
+  border     : none;
+  padding    : 0;
+  display    : flex;
+  align-items: center;
+  justify-content: center;
+  transition : color var(--dur), opacity var(--dur);
+}
+
+/* ── Close & Minimize — plain text glyphs ─────────────────── */
+.wbtn-close,
+.wbtn-minimize {
+  font-family  : var(--font-board);
+  font-size    : 13px;
+  font-weight  : 400;
+  line-height  : 1;
+  color        : var(--txt-dim);
+  width        : 24px;
+  height       : 24px;
+  border-radius: var(--radius-xs);
+  letter-spacing: 0;
+}
+
+.wbtn-close:hover    { color: var(--txt); }
+.wbtn-minimize:hover { color: var(--txt); }
+
+/* ── Theme cycle button (left side now) ───────────────────── */
+.wbtn-theme {
+  border       : 1px solid var(--border-ui);
+  border-radius: var(--radius-s);
+  width        : 28px;
+  height       : 28px;
+  color        : var(--txt-dim);
+  transition   : background var(--dur), color var(--dur), border-color var(--dur);
+}
+
+.wbtn-theme:hover {
+  background: var(--bg-raised);
+  color: var(--txt);
+}
+
+.wbtn-theme svg { width: 14px; height: 14px; }
+
+/* ── Theme icon visibility ─────────────────────────────────── */
+.icon-theme       { display: none; }
+
+[data-theme-mode="light"] .icon-sun  { display: block; }
+[data-theme-mode="dark"]  .icon-moon { display: block; }
+[data-theme-mode="auto"]  .icon-auto { display: block; }
+
+
+/* ── 4. App Layout ────────────────────────────────────────── */
+
+.app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 20px 18px;
+  gap: 12px;
+  overflow: hidden;
+}
+
+
+/* ── 5. Top Bar ───────────────────────────────────────────── */
+
+.topbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.app-title {
+  font-size  : 22px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color      : var(--txt);
+  line-height: 1;
+}
+
+.timer {
+  font-family  : var(--font-board);
+  font-size    : 13px;
+  font-weight  : 500;
+  letter-spacing: 0.06em;
+  color        : var(--txt-dim);
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Custom select ─────────────────────────────────────────────── */
+
+.select-wrap {
+  position: relative;
+  display : flex;
+  align-items: center;
+}
+
+.select {
+  appearance : none;
+  -webkit-appearance: none;
+  background : var(--sel-bg);
+  border     : 1px solid var(--border-ui);
+  border-radius: var(--radius-s);
+  color      : var(--txt-dim);
+  font-family: var(--font-ui);
+  font-size  : 12px;
+  font-weight: 500;
+  padding    : 5px 26px 5px 10px;
+  outline    : none;
+  cursor     : pointer;
+  transition : border-color var(--dur), color var(--dur), background var(--dur);
+}
+
+.select:focus { border-color: var(--accent); color: var(--txt); }
+
+.select-arrow {
+  position     : absolute;
+  right        : 8px;
+  width        : 9px; height: 6px;
+  color        : var(--txt-dim);
+  pointer-events: none;
+}
+
+/* Primary button ────────────────────────────────────────────── */
+
+.btn-primary {
+  background   : var(--accent);
+  color        : #fff;
+  border       : none;
+  border-radius: var(--radius-s);
+  font-size    : 12px;
+  font-weight  : 600;
+  letter-spacing: 0.01em;
+  padding      : 6px 14px;
+  transition   : opacity var(--dur), transform var(--dur);
+  white-space  : nowrap;
+}
+
+.btn-primary:hover  { opacity: 0.85; transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); opacity: 0.95; }
+
+
+/* ── 6. Board ─────────────────────────────────────────────── */
+
+.board-wrap {
+  flex-shrink: 0;
+  /* subtle shadow to lift the board */
+  filter: drop-shadow(0 4px 20px rgba(0,0,0,0.3));
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows   : repeat(9, 1fr);
+  width : 454px;
+  height: 454px;
+  background : var(--bg-surface);
+  border     : 2px solid var(--border-outer);
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+  transition: background var(--dur-lg) var(--ease),
+              border-color var(--dur-lg) var(--ease);
+}
+
+/* ── Cell ─────────────────────────────────────────────────── */
+
+.cell {
+  position : relative;
+  display  : flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: var(--font-board);
+  font-size  : 20px;
+  font-weight: 500;
+  line-height: 1;
+
+  border-right : 1px solid var(--border-thin);
+  border-bottom: 1px solid var(--border-thin);
+
+  cursor    : pointer;
+  outline   : none;
+  transition: background var(--dur);
+}
+
+/* Box-separator: right border after columns 3 & 6 */
+.cell[data-col="2"],
+.cell[data-col="5"] {
+  border-right: 2px solid var(--border-box);
+}
+
+/* Box-separator: bottom border after rows 3 & 6 */
+.cell[data-row="2"],
+.cell[data-row="5"] {
+  border-bottom: 2px solid var(--border-box);
+}
+
+/* Remove redundant outer edge borders */
+.cell[data-col="8"] { border-right:  none; }
+.cell[data-row="8"] { border-bottom: none; }
+
+/* ── Cell states ──────────────────────────────────────────── */
+
+.cell.is-given      { color: var(--txt-given);  font-weight: 700; }
+.cell.is-user       { color: var(--txt-user);   font-weight: 500; }
+.cell.is-err        { color: var(--txt-err) !important; background: var(--cell-err); }
+.cell.is-selected   { background: var(--cell-sel); }
+.cell.is-same-val   { background: var(--cell-same); }
+.cell.is-related    { background: var(--cell-rel); }
+
+.cell:hover:not(.is-given):not(.is-selected) {
+  background: var(--bg-hover);
+}
+
+/* Hint flash */
+@keyframes hint-pop {
+  0%  { box-shadow: inset 0 0 0 0   var(--accent-glow); }
+  40% { box-shadow: inset 0 0 0 3px var(--accent-glow); }
+  100%{ box-shadow: inset 0 0 0 0   transparent; }
+}
+
+.cell.hint-flash { animation: hint-pop 0.55s var(--ease); }
+
+/* ── Notes sub-grid ───────────────────────────────────────── */
+
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows   : repeat(3, 1fr);
+  width : 100%;
+  height: 100%;
+  padding: 2px;
+}
+
+.note-n {
+  display  : flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-board);
+  font-size  : 8px;
+  font-weight: 500;
+  color      : var(--txt-note);
+  line-height: 1;
+}
+
+
+/* ── 7. Number Pad ────────────────────────────────────────── */
+
+.numpad {
+  display: flex;
+  gap    : 6px;
+}
+
+.num {
+  width : 42px;
+  height: 46px;
+  border-radius: var(--radius-s);
+  border    : 1px solid var(--border-ui);
+  background: var(--btn-bg);
+  color     : var(--txt);
+  font-family: var(--font-board);
+  font-size  : 18px;
+  font-weight: 500;
+  display : flex; align-items: center; justify-content: center;
+  transition: background var(--dur), border-color var(--dur),
+              transform var(--dur), color var(--dur);
+}
+
+.num:hover {
+  background  : var(--btn-hover);
+  border-color: var(--accent);
+  transform   : translateY(-2px);
+}
+
+.num:active   { transform: translateY(0); }
+
+.num.is-flash {
+  background  : var(--accent);
+  border-color: var(--accent);
+  color       : #fff;
+}
+
+
+/* ── 8. Action Toolbar ────────────────────────────────────── */
+
+.toolbar {
+  display: flex;
+  gap    : 6px;
+}
+
+.tool {
+  display      : flex;
+  flex-direction: column;
+  align-items  : center;
+  gap          : 3px;
+  padding      : 8px 16px;
+  border-radius: var(--radius-s);
+  border       : 1px solid var(--border-ui);
+  background   : var(--btn-bg);
+  color        : var(--btn-txt);
+  font-size    : 10px;
+  font-weight  : 500;
+  letter-spacing: 0.03em;
+  transition   : background var(--dur), color var(--dur),
+                 border-color var(--dur), transform var(--dur);
+}
+
+.tool svg { width: 15px; height: 15px; stroke: currentColor; }
+
+.tool:hover {
+  background: var(--btn-hover);
+  color     : var(--txt);
+  transform : translateY(-1px);
+}
+
+.tool:active { transform: translateY(0); }
+
+.tool.is-active {
+  background  : var(--accent-dim);
+  border-color: var(--accent);
+  color       : var(--accent);
+}
+
+
+/* ── 9. Win Overlay ───────────────────────────────────────── */
+
+.overlay {
+  position: fixed; inset: 0;
+  display : flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity       : 0;
+  pointer-events: none;
+  transition    : opacity var(--dur-lg) var(--ease);
+  z-index       : 50;
+}
+
+.overlay.is-visible {
+  opacity       : 1;
+  pointer-events: all;
+}
+
+.overlay-card {
+  background   : var(--bg-surface);
+  border       : 1px solid var(--border-box);
+  border-radius: var(--radius);
+  padding      : 44px 52px;
+  text-align   : center;
+  display      : flex;
+  flex-direction: column;
+  align-items  : center;
+  gap          : 10px;
+  transform    : translateY(18px) scale(0.97);
+  transition   : transform var(--dur-lg) var(--ease);
+}
+
+.overlay.is-visible .overlay-card {
+  transform: translateY(0) scale(1);
+}
+
+.overlay-icon {
+  font-size  : 40px;
+  line-height: 1;
+  color      : var(--accent);
+  margin-bottom: 4px;
+}
+
+.overlay-title {
+  font-size    : 24px;
+  font-weight  : 700;
+  letter-spacing: -0.03em;
+}
+
+.overlay-sub {
+  color    : var(--txt-dim);
+  font-size: 13px;
+}
+
+.overlay-cta { margin-top: 10px; padding: 9px 28px; font-size: 14px; }
+
+
+/* ── 10. Scrollbar (hidden) ───────────────────────────────── */
+
+::-webkit-scrollbar { display: none; }
+
+
+/* ── 11. Focus ring (keyboard accessibility) ─────────────── */
+
+.cell:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+
+/* ── 12. Transitions for theme switch ────────────────────── */
+
+body,
+.titlebar,
+.board,
+.cell,
+.select,
+.btn-primary,
+.num,
+.tool,
+.overlay-card {
+  transition-property: background, color, border-color, box-shadow;
+  transition-duration: var(--dur-lg);
+  transition-timing-function: var(--ease);
+}
+
+
+/* ── 13. Game Meta Row (timer + lives) ───────────────────── */
+
+.game-meta {
+  display    : flex;
+  align-items: center;
+  gap        : 8px;
+}
+
+/* ── Mistake Pips ─────────────────────────────────────────── */
+
+.lives {
+  display    : flex;
+  align-items: center;
+  gap        : 4px;
+}
+
+/* Each pip: small circle, empty = remaining slot */
+.pip {
+  width        : 7px;
+  height       : 7px;
+  border-radius: 50%;
+  border       : 1.5px solid var(--txt-dim);
+  background   : transparent;
+  transition   : background var(--dur), border-color var(--dur),
+                 transform 0.1s var(--ease);
+}
+
+/* Filled = mistake made */
+.pip.pip-used {
+  background  : var(--err);
+  border-color: var(--err);
+}
+
+/* Divider between pips and last pip (visual grouping) */
+.pip-separator {
+  width     : 1px;
+  height    : 10px;
+  background: var(--border-thin);
+  margin    : 0 2px;
+}
+
+/* ── Shake animation on new mistake ──────────────────────── */
+
+@keyframes cell-shake {
+  0%,100% { transform: translateX(0); }
+  15%     { transform: translateX(-5px); }
+  30%     { transform: translateX( 5px); }
+  45%     { transform: translateX(-4px); }
+  60%     { transform: translateX( 4px); }
+  75%     { transform: translateX(-2px); }
+  90%     { transform: translateX( 2px); }
+}
+
+.cell.is-shake {
+  animation: cell-shake 0.38s var(--ease);
+}
+
+/* Pip pop-in when a mistake is registered */
+@keyframes pip-pop {
+  0%  { transform: scale(0.4); opacity: 0.4; }
+  60% { transform: scale(1.4); }
+  100%{ transform: scale(1);   opacity: 1; }
+}
+
+.pip.pip-new {
+  animation: pip-pop 0.32s var(--ease) forwards;
+}
+
+
+/* ── 14. Win / Lose Overlay Variants ─────────────────────── */
+
+/* Win: accent colour (default) */
+[data-result="win"] .overlay-icon  { color: var(--accent); }
+
+/* Lose: error colour */
+[data-result="lose"] .overlay-icon {
+  color    : var(--err);
+  animation: none;
+}
+
+[data-result="lose"] .overlay-title { color: var(--err); }
+
+[data-result="lose"] .btn-primary {
+  background: var(--err);
+}
+
+[data-result="lose"] .btn-primary:hover { opacity: 0.82; }
+
+
+/* ── 15. Locked board (game over state) ──────────────────── */
+
+.board.is-locked .cell:not(.is-given) {
+  opacity: 0.55;
+  cursor : default;
+  pointer-events: none;
+}
+
+.board.is-locked .cell.is-given {
+  cursor: default;
+  pointer-events: none;
+}
+
+
+/* ── 16. Exhausted hint button ────────────────────────────── */
+
+.tool.is-exhausted {
+  opacity       : 0.35;
+  pointer-events: none;
+  cursor        : default;
+}
